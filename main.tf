@@ -15,7 +15,7 @@ provider "aws" {
 
 # S3 Bucket for application assets
 resource "aws_s3_bucket" "app_bucket" {
-  bucket = "${var.project_name}-${var.environment}-bucket"
+  bucket        = "${var.project_name}-${var.environment}-bucket"
   force_destroy = true
   tags = {
     Name        = "${var.project_name}-bucket"
