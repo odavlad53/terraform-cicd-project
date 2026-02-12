@@ -14,9 +14,11 @@ on:
   workflow_dispatch:
 
 env:
+  TF_VAR_project_name: 'olga-project'
+  TF_VAR_environment: 'dev'
+  TF_VAR_aws_region: 'us-east-1'
   TF_VERSION: '1.6.0'
   WORKING_DIR: '.'
-  AWS_REGION: 'us-east-1'
 
 jobs:
   terraform-validate:
