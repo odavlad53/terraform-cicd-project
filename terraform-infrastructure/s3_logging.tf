@@ -48,3 +48,7 @@ resource "aws_s3_bucket_logging" "log_bucket_logging" {
   target_bucket = aws_s3_bucket.log_bucket.id
   target_prefix = "log-bucket-access-logs/"
 }
+#checkov:skip=CKV_AWS_144: log bucket is non-critical for CRR in this lab; app data bucket already has CRR
+resource "aws_s3_bucket" "log_bucket" {
+  ...
+}
