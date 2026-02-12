@@ -76,10 +76,12 @@ data "aws_ami" "al2023" {
 resource "aws_instance" "app_server" {
   ami           = var.ami_id
   instance_type = "t2.micro"
+  ebs_optimized = true
 
   lifecycle {
     ignore_changes = [
-      root_block_device
+      root_block_device,
+      ebs_optimized
     ]
   }
 
