@@ -1,4 +1,3 @@
-
 terraform {
   required_version = ">= 1.0"
   required_providers {
@@ -6,16 +5,19 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 }
 
-provider "aws" {
-  region = var.aws_region
-}
-
 # S3 Bucket for application assets
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
+}
 resource "aws_s3_bucket" "app_bucket" {
-  bucket        = "${var.project_name}-${var.environment}-bucket"
+  bucket        = "${var.project_name}-${var.environment}-bucket-${random_id.bucket_suffix.hex}"
   force_destroy = true
   tags = {
     Name        = "${var.project_name}-bucket"
