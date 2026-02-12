@@ -1,6 +1,7 @@
 resource "aws_sqs_queue" "s3_events" {
-  name                      = "${var.project_name}-${var.environment}-s3-events"
-  message_retention_seconds = 86400
+  name = "${var.project_name}-${var.environment}-s3-events"
+
+  sqs_managed_sse_enabled = true
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-s3-events"
@@ -8,6 +9,7 @@ resource "aws_sqs_queue" "s3_events" {
     ManagedBy   = "Terraform"
   }
 }
+
 
 data "aws_iam_policy_document" "s3_to_sqs" {
   statement {

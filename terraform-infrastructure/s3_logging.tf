@@ -37,8 +37,14 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket_encryp
   }
 }
 
-resource "aws_s3_bucket_logging" "app_bucket_logging" {
-  bucket        = aws_s3_bucket.app_bucket.id
+resource "aws_s3_bucket_logging" "replica_bucket_logging" {
+  bucket        = aws_s3_bucket.replica_bucket.id
   target_bucket = aws_s3_bucket.log_bucket.id
-  target_prefix = "access-logs/"
+  target_prefix = "replica-access-logs/"
+}
+
+resource "aws_s3_bucket_logging" "log_bucket_logging" {
+  bucket        = aws_s3_bucket.log_bucket.id
+  target_bucket = aws_s3_bucket.log_bucket.id
+  target_prefix = "log-bucket-access-logs/"
 }
