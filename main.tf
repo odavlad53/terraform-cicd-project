@@ -13,11 +13,8 @@ terraform {
 }
 
 # S3 Bucket for application assets
-resource "random_id" "bucket_suffix" {
-  byte_length = 4
-}
 resource "aws_s3_bucket" "app_bucket" {
-  bucket        = "${var.project_name}-${var.environment}-bucket-${random_id.bucket_suffix.hex}"
+  bucket        = "${var.project_name}-${var.environment}-bucket"
   force_destroy = true
   tags = {
     Name        = "${var.project_name}-bucket"
@@ -45,6 +42,17 @@ resource "aws_s3_bucket_public_access_block" "app_bucket_pab" {
   restrict_public_buckets = true
 }
 
+# Enable server-side encryption for S3 bucket
+resource "aws_s3_bucket_server_side_encryption_configuration" "app_bucket_encryption" {
+  bucket = aws_s3_bucket.app_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
 # Select the latest Amazon Linux 2023 x86_64 AMI in the current region.
 # This avoids hardcoding AMI IDs (which are region-specific and change over time).
 data "aws_ami" "al2023" {
@@ -63,10 +71,30 @@ data "aws_ami" "al2023" {
 }
 
 
-# EC2 Instance
+# EC2 Instance with IAM role
 resource "aws_instance" "app_server" {
-  ami           = data.aws_ami.al2023.id
+  ami           = var.ami_id
   instance_type = "t2.micro"
+
+  lifecycle {
+    ignore_changes = [
+      root_block_device
+    ]
+  }
+
+  # Attach IAM role
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+
+  # Enable EBS encryption (will be ignored for existing instance)
+  root_block_device {
+    encrypted = true
+  }
+
+  # Disable IMDSv1 (security best practice)
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required" # Require IMDSv2
+  }
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-server"
@@ -74,9 +102,7 @@ resource "aws_instance" "app_server" {
     ManagedBy   = "Terraform"
   }
 
-  # Enable detailed monitoring
   monitoring = true
 }
-
 
 # pr-test change
