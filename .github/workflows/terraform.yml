@@ -14,11 +14,14 @@ on:
   workflow_dispatch:
 
 env:
+  TF_VERSION: '1.6.0'
+  WORKING_DIR: '.'
+  AWS_REGION: 'us-east-1'
+
+  # Terraform variables for CI (since terraform.tfvars is not committed)
   TF_VAR_project_name: 'olga-project'
   TF_VAR_environment: 'dev'
   TF_VAR_aws_region: 'us-east-1'
-  TF_VERSION: '1.6.0'
-  WORKING_DIR: '.'
 
 jobs:
   terraform-validate:
@@ -76,7 +79,6 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ env.AWS_REGION }}
 
-
       - name: Terraform Init
         working-directory: ${{ env.WORKING_DIR }}
         run: terraform init
@@ -101,10 +103,10 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-        aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
         working-directory: ${{ env.WORKING_DIR }}
