@@ -74,12 +74,13 @@ data "aws_ami" "al2023" {
 
 # EC2 Instance with IAM role
 resource "aws_instance" "app_server" {
-  ami           = var.ami_id
+  ami           = data.aws_ami.al2023.id
   instance_type = "t2.micro"
   ebs_optimized = true
 
   lifecycle {
     ignore_changes = [
+      ami,
       root_block_device,
       ebs_optimized
     ]

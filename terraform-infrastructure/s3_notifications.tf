@@ -46,10 +46,6 @@ resource "aws_s3_bucket_notification" "app_bucket_notifications" {
 
   depends_on = [aws_sqs_queue_policy.s3_events_policy]
 }
-resource "aws_s3_bucket_notification" "log_bucket_notifications" {
-  bucket      = aws_s3_bucket.log_bucket.id
-  eventbridge = true
-}
 
 resource "aws_s3_bucket_notification" "replica_bucket_notifications" {
   bucket      = aws_s3_bucket.replica_bucket.id
