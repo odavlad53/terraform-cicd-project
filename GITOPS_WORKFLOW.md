@@ -1,72 +1,43 @@
-name: 'Security Scanning'
+# GitOps Workflow Guide
 
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
-  schedule:
-    # Run security scan daily at 2 AM UTC
-    - cron: '0 2 * * *'
+## Branch Strategy
+- main - Production environment (protected)
+- develop - Development environment
+- feature/* - Feature branches
 
-jobs:
-  secret-scanning:
-    name: 'Secret Detection'
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+## Workflow Rules
+1. Never commit directly to main
+2. All changes via Pull Requests
+3. Require code review before merge
+4. All tests must pass
+5. Infrastructure as Code only
 
-    - name: TruffleHog Secret Scan
-      uses: trufflesecurity/trufflehog@main
-      with:
-        path: ./
-        base: main
-        head: HEAD
+## Making Changes
+1. Create feature branch:
+   git checkout -b feature/add-new-resource
 
-  dependency-scanning:
-    name: 'Dependency Check'
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+2. Make changes to Terraform code
 
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'config'
-        scan-ref: '.'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
+3. Test locally:
+   terraform fmt
+   terraform validate
+   terraform plan
 
-    - name: Upload Trivy results to GitHub Security
-      uses: github/codeql-action/upload-sarif@v3
-      if: always()
-      with:
-        sarif_file: 'trivy-results.sarif'
+4. Commit and push:
+   git add .
+   git commit -m "feat: add new S3 bucket for logs"
+   git push origin feature/add-new-resource
 
-  terraform-compliance:
-    name: 'Terraform Compliance Check'
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+5. Create Pull Request on GitHub
+6. Wait for CI/CD checks to pass
+7. Request review from team member
+8. After approval, merge to main
+9. Monitor the automatic deployment
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-
-    - name: Terraform Init
-      working-directory: ./terraform-infrastructure
-      run: terraform init -backend=false
-
-    - name: Checkov Security Scan
-      uses: bridgecrewio/checkov-action@master
-      with:
-        directory: terraform-infrastructure/
-        framework: terraform
-        soft_fail: false
+## Security Checklist
+- [ ] No secrets in code
+- [ ] All resources tagged
+- [ ] Encryption enabled
+- [ ] Least privilege IAM
+- [ ] Security scans passed
+- [ ] Code reviewed
