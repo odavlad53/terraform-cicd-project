@@ -122,3 +122,16 @@ resource "aws_s3_bucket_replication_configuration" "app_bucket_replication" {
     }
   }
 }
+resource "aws_s3_bucket_lifecycle_configuration" "replica_bucket_lifecycle" {
+  provider = aws.replica
+  bucket   = aws_s3_bucket.replica_bucket.id
+
+  rule {
+    id     = "abort-incomplete-mpu"
+    status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
