@@ -2,8 +2,10 @@
 # Access logs bucket (PRIMARY region)
 ########################################
 
-# checkov:skip=CKV_AWS_18: "Access logs bucket does not need to log itself for this lab"
-# trivy:ignore:aws-s3-enable-logging
+#checkov:skip=CKV2_AWS_62: log buckets don't need event notifications
+#checkov:skip=CKV_AWS_144: log buckets are dedicated targets; replication not required for this lab
+# trivy:ignore:aws-s3-enable-logging  # log target bucket; avoid log-of-logs recursion
+# trivy:ignore:AVD-AWS-0089
 resource "aws_s3_bucket" "access_logs_bucket" {
   bucket        = "${var.project_name}-${var.environment}-access-logs"
   force_destroy = true
@@ -76,8 +78,10 @@ resource "aws_s3_bucket_logging" "app_bucket_logging" {
 # Access logs bucket (REPLICA region)
 ########################################
 
-# checkov:skip=CKV_AWS_18: "Access logs bucket does not need to log itself for this lab"
-# trivy:ignore:aws-s3-enable-logging
+#checkov:skip=CKV2_AWS_62: log buckets don't need event notifications
+#checkov:skip=CKV_AWS_144: log buckets are dedicated targets; replication not required for this lab
+# trivy:ignore:AVD-AWS-0089
+# trivy:ignore:aws-s3-enable-logging  # log target bucket; avoid log-of-logs recursion
 resource "aws_s3_bucket" "replica_access_logs_bucket" {
   provider      = aws.replica
   bucket        = "${var.project_name}-${var.environment}-access-logs-replica"
