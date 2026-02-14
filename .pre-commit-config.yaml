@@ -7,6 +7,7 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
       - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
       - id: detect-private-key
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
@@ -14,4 +15,4 @@ repos:
     hooks:
       - id: terraform_fmt
       - id: terraform_validate
-      - id: terraform_tfsec
+      - id: terraform_trivy

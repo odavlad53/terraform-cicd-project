@@ -44,4 +44,3 @@ resource "aws_kms_alias" "s3_cmk_alias" {
   name          = "alias/${var.project_name}-${var.environment}-s3-cmk"
   target_key_id = aws_kms_key.s3_cmk.key_id
 }
-

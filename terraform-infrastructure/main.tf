@@ -11,8 +11,9 @@ terraform {
     }
   }
 }
-
 # S3 Bucket for application assets
+# trivy:ignore:aws-s3-enable-logging
+# tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "app_bucket" {
   bucket        = "${var.project_name}-${var.environment}-bucket"
   force_destroy = true

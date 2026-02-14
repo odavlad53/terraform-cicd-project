@@ -16,4 +16,3 @@ resource "aws_s3_bucket_lifecycle_configuration" "app_bucket_lifecycle" {
     }
   }
 }
-

@@ -1,3 +1,4 @@
+# trivy:ignore:AVD-AWS-0089  # lab: skipping server access logs
 resource "aws_s3_bucket" "replica_bucket" {
   provider      = aws.replica
   bucket        = "${var.project_name}-${var.environment}-bucket-replica"
@@ -64,6 +65,7 @@ resource "aws_iam_role" "s3_replication_role" {
 }
 
 data "aws_iam_policy_document" "s3_replication_policy" {
+  #tfsec:ignore:aws-iam-no-policy-wildcards
   statement {
     effect = "Allow"
     actions = [

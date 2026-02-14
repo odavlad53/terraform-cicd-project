@@ -13,7 +13,7 @@ jobs:
   secret-scanning:
     name: 'Secret Detection'
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
   dependency-scanning:
     name: 'Dependency Check'
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -52,7 +52,7 @@ jobs:
   terraform-compliance:
     name: 'Terraform Compliance Check'
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
