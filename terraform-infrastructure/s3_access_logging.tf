@@ -2,8 +2,8 @@
 # Access logs bucket (PRIMARY region)
 ########################################
 
-#checkov:skip=CKV2_AWS_62: log buckets don't need event notifications
-#checkov:skip=CKV_AWS_144: log buckets are dedicated targets; replication not required for this lab
+#checkov:skip=CKV2_AWS_62: Access-log target bucket - notifications not required (avoid recursion/noise)
+#checkov:skip=CKV_AWS_144: Access-log target bucket - replication not required (separate DR strategy / avoid log-of-logs)
 # trivy:ignore:aws-s3-enable-logging  # log target bucket; avoid log-of-logs recursion
 # trivy:ignore:AVD-AWS-0089
 resource "aws_s3_bucket" "access_logs_bucket" {
@@ -78,8 +78,8 @@ resource "aws_s3_bucket_logging" "app_bucket_logging" {
 # Access logs bucket (REPLICA region)
 ########################################
 
-#checkov:skip=CKV2_AWS_62: log buckets don't need event notifications
-#checkov:skip=CKV_AWS_144: log buckets are dedicated targets; replication not required for this lab
+#checkov:skip=CKV2_AWS_62: Access-log target bucket - notifications not required (avoid recursion/noise)
+#checkov:skip=CKV_AWS_144: Access-log target bucket - replication not required (separate DR strategy / avoid log-of-logs)
 # trivy:ignore:AVD-AWS-0089
 # trivy:ignore:aws-s3-enable-logging  # log target bucket; avoid log-of-logs recursion
 resource "aws_s3_bucket" "replica_access_logs_bucket" {
