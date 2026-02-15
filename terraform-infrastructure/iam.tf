@@ -40,14 +40,6 @@ resource "aws_iam_role_policy" "ec2_s3_policy" {
           aws_s3_bucket.app_bucket.arn,
           "${aws_s3_bucket.app_bucket.arn}/*"
         ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "kms:Decrypt",
-          "kms:DescribeKey"
-        ]
-        Resource = aws_kms_key.s3_cmk.arn
       }
     ]
   })
