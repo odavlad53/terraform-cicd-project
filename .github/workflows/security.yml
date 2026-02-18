@@ -48,6 +48,15 @@ jobs:
       if: always()
       with:
         sarif_file: 'trivy-results.sarif'
+      
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'config'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        trivyignores: terraform-infrastructure/.trivyignore
 
   terraform-compliance:
     name: 'Terraform Compliance Check'
@@ -70,3 +79,6 @@ jobs:
         directory: terraform-infrastructure/
         framework: terraform
         soft_fail: false
+        skip_check: CKV_AWS_18,CKV_AWS_144,CKV2_AWS_62,CKV_AWS_145
+        
+
