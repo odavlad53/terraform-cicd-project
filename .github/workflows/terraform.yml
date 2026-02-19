@@ -17,6 +17,7 @@ env:
   TF_VERSION: '1.6.0'
   WORKING_DIR: '.'
   AWS_REGION: 'us-east-1'
+  TF_INPUT: 'false'
 
   # Terraform variables for CI (since terraform.tfvars is not committed)
   TF_VAR_project_name: 'olga-project'
@@ -84,7 +85,7 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ${{ env.WORKING_DIR }}
-        run: terraform plan -no-color
+        run: terraform plan -input=false  -no-color
 
   terraform-apply:
     name: Terraform Apply (manual approval via environment)
