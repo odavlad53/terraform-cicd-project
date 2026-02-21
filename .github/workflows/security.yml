@@ -48,7 +48,7 @@ jobs:
       if: always()
       with:
         sarif_file: 'trivy-results.sarif'
-      
+
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
@@ -80,5 +80,3 @@ jobs:
         framework: terraform
         soft_fail: false
         skip_check: CKV_AWS_18,CKV_AWS_144,CKV2_AWS_62,CKV_AWS_145
-        
-
