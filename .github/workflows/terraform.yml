@@ -15,7 +15,7 @@ on:
 
 env:
   TF_VERSION: '1.6.0'
-  WORKING_DIR: './terraform-infrastructure'
+  WORKING_DIR: '.'
   AWS_REGION: 'us-east-1'
 
   # Terraform variables for CI (since terraform.tfvars is not committed)
@@ -85,6 +85,8 @@ jobs:
       - name: Terraform Plan
         working-directory: ${{ env.WORKING_DIR }}
         run: terraform plan -no-color
+        env:
+          TF_INPUT: "false"
 
   terraform-apply:
     name: Terraform Apply (manual approval via environment)
@@ -112,4 +114,6 @@ jobs:
 
       - name: Terraform Apply
         working-directory: ${{ env.WORKING_DIR }}
-        run: terraform apply -auto-approve
+        run: terraform apply -input=false -auto-approve
+        env:
+          TF_INPUT: "false"
