@@ -84,7 +84,9 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ${{ env.WORKING_DIR }}
-        run: terraform plan -no-color
+        run: terraform plan -input=false -no-color
+        env:
+           TF_INPUT: "false"
 
   terraform-apply:
     name: Terraform Apply (manual approval via environment)
