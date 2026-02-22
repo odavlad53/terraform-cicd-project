@@ -15,8 +15,10 @@ on:
 
 env:
   TF_VERSION: '1.6.0'
-  WORKING_DIR: '.'
+  WORKING_DIR: './terraform-infrastructure'
   AWS_REGION: 'us-east-1'
+  TF_INPUT: 'false'
+  TF_VAR_ami_id: 'ami-07b93c1395cedf7c5'   # use the AMI from Step 1
 
   # Terraform variables for CI (since terraform.tfvars is not committed)
   TF_VAR_project_name: 'olga-project'
@@ -84,7 +86,7 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ${{ env.WORKING_DIR }}
-        run: terraform plan -no-color
+        run: terraform plan -input=false -no-color
 
   terraform-apply:
     name: Terraform Apply (manual approval via environment)
