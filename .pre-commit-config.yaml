@@ -15,4 +15,6 @@ repos:
     hooks:
       - id: terraform_fmt
       - id: terraform_validate
-      - id: terraform_trivy
+        args:
+          - --tf-init-args=-backend=false
+      - id: terraform_tfsec

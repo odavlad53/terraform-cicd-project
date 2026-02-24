@@ -4,12 +4,12 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'terraform-infrastructure/**/*.tf'
+      - 'terraform-infrastructure/**'
       - '.github/workflows/terraform.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'terraform-infrastructure/**/*.tf'
+      - 'terraform-infrastructure/**'
       - '.github/workflows/terraform.yml'
   workflow_dispatch:
 
