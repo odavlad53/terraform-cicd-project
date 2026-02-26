@@ -1,3 +1,6 @@
+#checkov:skip=CKV_AWS_356:KMS key policy requires Resource "*" and is constrained by principals/conditions
+#checkov:skip=CKV_AWS_109:KMS key policy admin/use statements are intentionally scoped by principal
+#checkov:skip=CKV_AWS_111:KMS Encrypt/Decrypt are required; constraints are enforced via key policy principals
 data "aws_iam_policy_document" "s3_key_policy" {
   # Admin: account root
   statement {
