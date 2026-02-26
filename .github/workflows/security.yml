@@ -62,7 +62,8 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init (no backend)
-        run: terraform init -backend=false
+        working-directory: terraform-infrastructure
+        run: terraform init -backend=false -input=false
 
       - name: Checkov Security Scan
         uses: bridgecrewio/checkov-action@master
