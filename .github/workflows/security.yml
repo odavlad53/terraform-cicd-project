@@ -1,10 +1,20 @@
 name: Security Scanning
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main, develop]
+    paths:
+      - 'terraform-infrastructure/**'
+      - '.github/workflows/security.yml'
   pull_request:
     branches: [main]
+    paths:
+      - 'terraform-infrastructure/**'
+      - '.github/workflows/security.yml'
   schedule:
     - cron: '0 2 * * *'
 
@@ -57,13 +67,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Init (no backend)
-        working-directory: terraform-infrastructure
-        run: terraform init -backend=false -input=false
 
       - name: Checkov Security Scan
         uses: bridgecrewio/checkov-action@master
