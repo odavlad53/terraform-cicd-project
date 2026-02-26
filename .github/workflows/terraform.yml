@@ -4,24 +4,26 @@ on:
   push:
     branches: [ main ]
     paths:
-      - '**/*.tf'
+      - 'terraform-infrastructure/**'
       - '.github/workflows/terraform.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - '**/*.tf'
+      - 'terraform-infrastructure/**'
       - '.github/workflows/terraform.yml'
   workflow_dispatch:
 
 env:
   TF_VERSION: '1.6.0'
-  WORKING_DIR: '.'
+  WORKING_DIR: './terraform-infrastructure'
   AWS_REGION: 'us-east-1'
+  TF_INPUT: 'false'
 
-  # Terraform variables for CI (since terraform.tfvars is not committed)
+  # Terraform vars for CI (terraform.tfvars is not committed)
   TF_VAR_project_name: 'olga-project'
   TF_VAR_environment: 'dev'
   TF_VAR_aws_region: 'us-east-1'
+  TF_VAR_ami_id: 'ami-07b93c1395cedf7c5'
 
 jobs:
   terraform-validate:
@@ -40,7 +42,7 @@ jobs:
 
       - name: Terraform Init (no backend)
         working-directory: ${{ env.WORKING_DIR }}
-        run: terraform init -backend=false
+        run: terraform init -backend=false -input=false
 
       - name: Terraform Validate
         working-directory: ${{ env.WORKING_DIR }}
@@ -60,7 +62,7 @@ jobs:
           soft_fail: false
 
   terraform-plan:
-    name: Terraform Plan
+    name: Terraform Plan (PR)
     runs-on: ubuntu-latest
     needs: [terraform-validate, terraform-security-scan]
     if: github.event_name == 'pull_request'
@@ -80,11 +82,13 @@ jobs:
 
       - name: Terraform Init
         working-directory: ${{ env.WORKING_DIR }}
-        run: terraform init
+        run: terraform init -input=false
 
+      # -input=false prevents hanging
+      # -refresh=false avoids IAM GetRole reads (your CI user lacks iam:GetRole)
       - name: Terraform Plan
         working-directory: ${{ env.WORKING_DIR }}
-        run: terraform plan -no-color
+        run: terraform plan -input=false -no-color -refresh=false
 
   terraform-apply:
     name: Terraform Apply (manual approval via environment)
@@ -108,8 +112,8 @@ jobs:
 
       - name: Terraform Init
         working-directory: ${{ env.WORKING_DIR }}
-        run: terraform init
+        run: terraform init -input=false
 
       - name: Terraform Apply
         working-directory: ${{ env.WORKING_DIR }}
-        run: terraform apply -auto-approve
+        run: terraform apply -input=false -auto-approve -refresh=false
