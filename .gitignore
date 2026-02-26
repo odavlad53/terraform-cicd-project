@@ -12,3 +12,7 @@ override.tf.json
 .venv/
 **/.venv/
 tf-ci-iam.json
+
+# awscli installer leftovers
+aws/
+awscliv2.zip

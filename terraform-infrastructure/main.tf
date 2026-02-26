@@ -87,10 +87,5 @@ resource "aws_instance" "app_server" {
   }
 
   monitoring = true
-
-  tags = {
-    Name        = "${var.project_name}-${var.environment}-server"
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-  }
 }
+# trigger ci
