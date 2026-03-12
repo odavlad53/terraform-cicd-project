@@ -36,8 +36,8 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: main
-          head: HEAD
+          #base: main
+          #head: HEAD
 
   dependency-scanning:
     name: Dependency / Config Scan (Trivy)
