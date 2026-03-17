@@ -1,0 +1,9 @@
+{
+  "name": "hello-world-ecs",
+  "version": "1.0.0",
+  "description": "Simple Hello World app for ECS deployment",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
