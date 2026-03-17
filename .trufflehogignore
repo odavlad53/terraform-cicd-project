@@ -1,8 +1,7 @@
-tfsec-checkgen
-tfsec.tar.gz
-*.tar.gz
-*.zip
-.terraform/
-**/.terraform/**
-*.tfstate
-*.tfstate.*
+^tfsec-checkgen$
+^tfsec\.tar\.gz$
+.*\.tar\.gz$
+.*\.zip$
+^aws/.*$
+^\.terraform/.*$
+.*\.tfstate(\..*)?$
