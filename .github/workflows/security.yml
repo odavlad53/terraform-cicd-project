@@ -36,6 +36,7 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
+          extra_args: --exclude-paths .trufflehogignore
 
   dependency-scanning:
     name: Dependency / Config Scan (Trivy)

@@ -16,3 +16,9 @@ tf-ci-iam.json
 # awscli installer leftovers
 aws/
 awscliv2.zip
+
+# large/binary artifacts (do not commit)
+tfsec-checkgen
+tfsec.tar.gz
+*.tar.gz
+*.zip
