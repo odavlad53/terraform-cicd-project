@@ -12,10 +12,61 @@ resource "aws_ecs_cluster" "this" {
     ManagedBy   = "Terraform"
   }
 }
+resource "aws_kms_key" "ecs_logs" {
+  description         = "CMK for ECS CloudWatch Logs (${var.project_name}-${var.environment})"
+  enable_key_rotation = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableRootPermissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogsUseOfKey"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${var.aws_region}.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+        Condition = {
+          ArnEquals = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/ecs/${var.project_name}-${var.environment}"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-ecs-logs-kms"
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+resource "aws_kms_alias" "ecs_logs" {
+  name          = "alias/${var.project_name}-${var.environment}-ecs-logs"
+  target_key_id = aws_kms_key.ecs_logs.key_id
+}
 
 resource "aws_cloudwatch_log_group" "ecs" {
   name              = "/ecs/${var.project_name}-${var.environment}"
-  retention_in_days = 30
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.ecs_logs.arn
 
   tags = {
     Name        = "${var.project_name}-ecs-logs"
