@@ -1,6 +1,6 @@
 data "aws_caller_identity" "current" {}
 
-# Target bucket for Server Access Logs
+# Target bucket for Server Access Logs and ALB Access Logs
 #tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "log_bucket" {
   bucket        = "${var.project_name}-${var.environment}-access-logs"
@@ -13,7 +13,6 @@ resource "aws_s3_bucket" "log_bucket" {
   }
 }
 
-# Block public access on log bucket (good baseline)
 resource "aws_s3_bucket_public_access_block" "log_bucket" {
   bucket = aws_s3_bucket.log_bucket.id
 
@@ -23,7 +22,6 @@ resource "aws_s3_bucket_public_access_block" "log_bucket" {
   restrict_public_buckets = true
 }
 
-# Versioning on log bucket (recommended for audit logs)
 resource "aws_s3_bucket_versioning" "log_bucket" {
   bucket = aws_s3_bucket.log_bucket.id
 
@@ -32,14 +30,13 @@ resource "aws_s3_bucket_versioning" "log_bucket" {
   }
 }
 
-# Encrypt log bucket objects with your CMK (assumes aws_kms_key.s3_key exists)
+# ALB access logs require SSE-S3, not SSE-KMS
 resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket_encryption" {
   bucket = aws_s3_bucket.log_bucket.id
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm     = "aws:kms"
-      kms_master_key_id = aws_kms_key.s3_key.arn
+      sse_algorithm = "AES256"
     }
   }
 }
@@ -51,8 +48,8 @@ resource "aws_s3_bucket_logging" "app_bucket_logging" {
   target_prefix = "app-bucket/"
 }
 
-# Allow S3 logging service to write logs into the log bucket
 data "aws_iam_policy_document" "log_bucket_policy" {
+  # Allow S3 server access logs from the app bucket
   statement {
     sid    = "AllowS3ServerAccessLogs"
     effect = "Allow"
@@ -76,6 +73,23 @@ data "aws_iam_policy_document" "log_bucket_policy" {
       variable = "aws:SourceAccount"
       values   = [data.aws_caller_identity.current.account_id]
     }
+  }
+
+  # Allow ALB access logs
+  statement {
+    sid    = "AllowALBAccessLogs"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["logdelivery.elasticloadbalancing.amazonaws.com"]
+    }
+
+    actions = ["s3:PutObject"]
+
+    resources = [
+      "${aws_s3_bucket.log_bucket.arn}/alb/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
+    ]
   }
 }
 

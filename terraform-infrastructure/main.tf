@@ -1,17 +1,3 @@
-terraform {
-  required_version = ">= 1.0"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.0"
-    }
-  }
-}
-
 # S3 Bucket
 
 # trivy:ignore:AWS-0089  # Lab3 scope: no access logging bucket in this exercise
