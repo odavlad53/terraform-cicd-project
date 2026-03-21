@@ -1,3 +1,5 @@
+#checkov:skip=CKV2_AWS_20: Lab scope - HTTP only demo endpoint, no ACM certificate/domain for HTTPS redirect
+#checkov:skip=CKV2_AWS_28: Lab scope - WAF not implemented for this exercise
 resource "aws_lb" "this" {
   name               = "${var.project_name}-${var.environment}-alb"
   internal           = false
@@ -21,6 +23,7 @@ resource "aws_lb" "this" {
   }
 }
 
+#checkov:skip=CKV_AWS_378: Lab scope - ECS app traffic behind ALB uses HTTP on internal target group
 resource "aws_lb_target_group" "this" {
   name        = "${var.project_name}-${var.environment}-tg"
   port        = 3000
@@ -45,6 +48,8 @@ resource "aws_lb_target_group" "this" {
   }
 }
 
+#checkov:skip=CKV_AWS_2: Lab scope - listener intentionally uses HTTP for public demo access
+#checkov:skip=CKV_AWS_103: Lab scope - TLS policy not applicable because HTTPS listener is not used in this exercise
 resource "aws_lb_listener" "this" {
   load_balancer_arn = aws_lb.this.arn
   port              = 80

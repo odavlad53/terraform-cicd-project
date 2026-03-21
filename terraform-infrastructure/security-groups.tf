@@ -1,3 +1,5 @@
+#checkov:skip=CKV_AWS_260: Lab scope - ALB must accept public HTTP traffic for demo access
+#checkov:skip=CKV_AWS_382: Lab scope - outbound access left open for demo simplicity
 resource "aws_security_group" "alb" {
   name        = "${var.project_name}-${var.environment}-alb-sg"
   description = "Security group for Application Load Balancer"
@@ -26,6 +28,7 @@ resource "aws_security_group" "alb" {
   }
 }
 
+#checkov:skip=CKV_AWS_382: Lab scope - ECS tasks need general outbound access via NAT for ECR, logs and SSM
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.project_name}-${var.environment}-ecs-tasks-sg"
   description = "Security group for ECS tasks, only allows traffic from ALB"
