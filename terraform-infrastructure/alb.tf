@@ -4,16 +4,16 @@ resource "aws_lb" "this" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
   subnets            = [for s in aws_subnet.public : s.id]
-  
+
   access_logs {
-  bucket  = aws_s3_bucket.log_bucket.id
-  prefix  = "alb"
-  enabled = true
-}
+    bucket  = aws_s3_bucket.log_bucket.id
+    prefix  = "alb"
+    enabled = true
+  }
 
   drop_invalid_header_fields = true
   enable_deletion_protection = true
- 
+
   tags = {
     Name        = "${var.project_name}-${var.environment}-alb"
     Environment = var.environment
