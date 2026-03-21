@@ -114,15 +114,16 @@ resource "aws_iam_role_policy" "vpc_flow_logs" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "AllowWriteToSpecificFlowLogGroup"
         Effect = "Allow"
         Action = [
-          "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
-          "logs:DescribeLogGroups",
           "logs:DescribeLogStreams"
         ]
-        Resource = "*"
+        Resource = [
+          "${aws_cloudwatch_log_group.vpc_flow_logs.arn}:*"
+        ]
       }
     ]
   })
