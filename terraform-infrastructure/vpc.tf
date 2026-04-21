@@ -168,22 +168,23 @@ resource "aws_internet_gateway" "this" {
 }
 
 # --- Public Subnets (for ALB and NAT Gateway) ---
-
+#checkov:skip=CKV_AWS_130: Public subnets must auto-assign public IPs for ALB/NAT Gateway placement
 resource "aws_subnet" "public" {
   for_each = toset(local.azs)
 
   vpc_id                  = aws_vpc.this.id
   cidr_block              = each.key == local.azs[0] ? "10.0.1.0/24" : "10.0.2.0/24"
   availability_zone       = each.key
-  map_public_ip_on_launch = false
+  map_public_ip_on_launch = true
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-public-${each.key}"
-    Environment = var.environment
-    ManagedBy   = "Terraform"
+    Name                                                           = "${var.project_name}-${var.environment}-public-${each.key}"
+    Environment                                                    = var.environment
+    ManagedBy                                                      = "Terraform"
+    "kubernetes.io/role/elb"                                       = "1"
+    "kubernetes.io/cluster/${var.project_name}-${var.environment}" = "shared"
   }
 }
-
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
 
@@ -243,9 +244,11 @@ resource "aws_subnet" "private" {
   availability_zone = each.key
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-private-${each.key}"
-    Environment = var.environment
-    ManagedBy   = "Terraform"
+    Name                                                           = "${var.project_name}-${var.environment}-private-${each.key}"
+    Environment                                                    = var.environment
+    ManagedBy                                                      = "Terraform"
+    "kubernetes.io/role/internal-elb"                              = "1"
+    "kubernetes.io/cluster/${var.project_name}-${var.environment}" = "shared"
   }
 }
 

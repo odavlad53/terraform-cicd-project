@@ -22,3 +22,10 @@ tfsec-checkgen
 tfsec.tar.gz
 *.tar.gz
 *.zip
+
+# AWS IAM policy files downloaded for ALB controller setup
+iam-policy*.json
+**/iam-policy*.json
+
+# Stray files from accidental shell redirects
+**/null

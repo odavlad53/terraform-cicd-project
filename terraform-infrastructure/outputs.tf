@@ -47,3 +47,19 @@ output "vpc_id" {
   description = "ID of the VPC"
   value       = aws_vpc.this.id
 }
+
+output "eks_cluster_name" {
+  description = "Name of the EKS cluster"
+  value       = aws_eks_cluster.this.name
+}
+
+output "eks_cluster_endpoint" {
+  description = "Endpoint for the EKS cluster API server"
+  value       = aws_eks_cluster.this.endpoint
+}
+
+output "eks_cluster_ca" {
+  description = "Certificate authority data for the EKS cluster"
+  value       = aws_eks_cluster.this.certificate_authority[0].data
+  sensitive   = true
+}
