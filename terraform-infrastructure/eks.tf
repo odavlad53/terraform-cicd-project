@@ -169,7 +169,7 @@ resource "aws_eks_cluster" "this" {
     endpoint_private_access = true
     endpoint_public_access  = true
     # Restrict public API access to your IP only (replace with your actual IP/CIDR)
-    public_access_cidrs = ["146.70.129.27/32"]
+    public_access_cidrs = ["159.26.111.17/32"]
   }
 
   depends_on = [
