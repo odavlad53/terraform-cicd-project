@@ -1,3 +1,11 @@
+data "http" "my_ip" {
+  url = "https://checkip.amazonaws.com"
+}
+
+locals {
+  detected_ip      = "${chomp(data.http.my_ip.response_body)}/32"
+  eks_access_cidrs = length(var.eks_public_access_cidrs) > 0 ? var.eks_public_access_cidrs : [local.detected_ip]
+}
 # --- IAM: EKS Cluster Role ---
 
 resource "aws_iam_role" "eks_cluster" {
@@ -168,8 +176,8 @@ resource "aws_eks_cluster" "this" {
     )
     endpoint_private_access = true
     endpoint_public_access  = true
-    # Restrict public API access to your IP only (replace with your actual IP/CIDR)
-    public_access_cidrs = ["146.70.129.27/32"]
+    # Dynamically resolved — see data "http" "my_ip" and locals block above
+    public_access_cidrs = local.eks_access_cidrs
   }
 
   depends_on = [

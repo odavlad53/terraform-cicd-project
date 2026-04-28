@@ -20,3 +20,14 @@ variable "ami_id" {
   type        = string
   default     = ""
 }
+
+variable "eks_public_access_cidrs" {
+  description = <<-EOT
+    CIDRs for the EKS public API endpoint.
+    []               → auto-detect caller IP (local dev)
+    ["0.0.0.0/0"]   → open (CI/CD runners)
+    ["x.x.x.x/32"]  → explicit list (VPN / office)
+  EOT
+  type        = list(string)
+  default     = []
+}

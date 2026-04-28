@@ -168,8 +168,8 @@ resource "aws_internet_gateway" "this" {
 }
 
 # --- Public Subnets (for ALB and NAT Gateway) ---
-#checkov:skip=CKV_AWS_130: Public subnets must auto-assign public IPs for ALB/NAT Gateway placement
 resource "aws_subnet" "public" {
+  #checkov:skip=CKV_AWS_130: Public subnets must auto-assign public IPs for ALB/NAT Gateway placement
   for_each = toset(local.azs)
 
   vpc_id                  = aws_vpc.this.id
