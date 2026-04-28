@@ -24,6 +24,8 @@ env:
   TF_VAR_environment: 'dev'
   TF_VAR_aws_region: 'us-east-1'
   TF_VAR_ami_id: 'ami-07b93c1395cedf7c5'
+  # Open endpoint for CI — IAM auth still protects the cluster
+  TF_VAR_eks_public_access_cidrs: '["0.0.0.0/0"]' 
 
 jobs:
   terraform-validate:
