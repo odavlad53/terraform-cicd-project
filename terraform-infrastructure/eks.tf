@@ -216,10 +216,6 @@ resource "aws_eks_node_group" "this" {
     max_unavailable = 1
   }
 
-  lifecycle {
-    ignore_changes = [vpc_config[0].public_access_cidrs]
-  }
-
   depends_on = [
     aws_iam_role_policy_attachment.eks_worker_node,
     aws_iam_role_policy_attachment.eks_cni,
