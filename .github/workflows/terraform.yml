@@ -65,6 +65,9 @@ jobs:
 
   terraform-plan:
     name: Terraform Plan (PR)
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     needs: [terraform-validate, terraform-security-scan]
     if: github.event_name == 'pull_request'
@@ -78,8 +81,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
@@ -94,6 +96,9 @@ jobs:
 
   terraform-apply:
     name: Terraform Apply (manual approval via environment)
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     needs: [terraform-validate, terraform-security-scan]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -108,8 +113,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
