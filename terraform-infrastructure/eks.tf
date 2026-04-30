@@ -180,6 +180,10 @@ resource "aws_eks_cluster" "this" {
     public_access_cidrs = local.eks_access_cidrs
   }
 
+  lifecycle {
+    ignore_changes = [vpc_config[0].public_access_cidrs]
+  }
+
   depends_on = [
     aws_iam_role_policy_attachment.eks_cluster_policy,
     aws_cloudwatch_log_group.eks,
@@ -210,6 +214,10 @@ resource "aws_eks_node_group" "this" {
 
   update_config {
     max_unavailable = 1
+  }
+
+  lifecycle {
+    ignore_changes = [vpc_config[0].public_access_cidrs]
   }
 
   depends_on = [
