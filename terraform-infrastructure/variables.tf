@@ -35,4 +35,5 @@ variable "eks_public_access_cidrs" {
 variable "alert_email" {
   description = "Email for security alerts"
   type        = string
+  default     = ""
 }
