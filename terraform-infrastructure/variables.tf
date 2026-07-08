@@ -31,3 +31,8 @@ variable "eks_public_access_cidrs" {
   type        = list(string)
   default     = []
 }
+
+variable "alert_email" {
+  description = "Email for security alerts"
+  type        = string
+}

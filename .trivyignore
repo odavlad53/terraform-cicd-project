@@ -1,0 +1,5 @@
+# Trivy ignore file — documented CVE exceptions
+# Each exception must have a justification and review date
+
+# Example (uncomment if you hit a false positive):
+# CVE-2024-XXXXX  # Not exploitable in our context — review by 2026-08-01

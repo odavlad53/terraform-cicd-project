@@ -1,0 +1,141 @@
+# S3 bucket for Config snapshots
+resource "aws_s3_bucket" "config" {
+    bucket        ="${var.project_name}-${var.environment}-config-${data.aws_caller_identity.current.account_id}"
+    force_destroy = true
+
+    tags = {
+        Name        = "${var.project_name}-${var.environment}-config"
+        Environment = var.environment
+        ManagedBy   = "Terraform"  
+    }
+}
+
+resource "aws_s3_bucket_public_access_block" "config" {
+    bucket                  = aws_s3_bucket.config.id
+    block_public_acls       = true
+    block_public_policy     = true
+    ignore_public_acls      = true
+    restrict_public_buckets = true
+}
+
+# IAM role for Config
+data "aws_iam_policy_document" "config_assume" {
+    statement {
+        effect = "Allow"
+        principals {
+            type        = "Service"
+            identifiers = ["config.amazonaws.com"] 
+        }
+        actions = ["sts:AssumeRole"]
+    }
+}
+
+resource "aws_iam_role" "config" {
+    name               = "${var.project_name}-${var.environment}-config-role"
+    assume_role_policy = data.aws_iam_policy_document.config_assume.json
+
+    tags = {
+        Name        = "${var.project_name}-${var.environment}-config-role"
+        Environment = var.environment
+        ManagedBy   = "Terraform"
+   }
+}
+
+resource "aws_iam_role_policy_attachment" "config" {
+    role       = aws_iam_role.config.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWS_ConfigRole"
+}
+
+resource "aws_iam_role_policy" "config_s3" {
+    name  = "${var.project_name}-${var.environment}-config_s3" 
+    role  = aws_iam_role.config.id
+
+    policy = jsonencode ({
+        Version = "2012-10-17"
+        Statement = [{
+            Effect = "Allow"
+            Action = [
+                "s3:PutObject",
+                "s3:GetBucketAcl"
+            ]
+            Resource = [
+                aws_s3_bucket.config.arn,
+                "${aws_s3_bucket.config.arn}/*"
+            ]
+        }]
+    })
+}
+
+# Config recorder
+resource "aws_config_configuration_recorder" "this" {
+    name     = "${var.project_name}-${var.environment}-config"
+    role_arn = aws_iam_role.config.arn
+
+    recording_group {
+        all_supported                 = false
+        include_global_resource_types = true
+        resource_types = [
+            "AWS::EC2::Instance",
+            "AWS::EC2::SecurityGroup",
+            "AWS::ECS::Cluster",
+            "AWS::EKS::Cluster",
+            "AWS::S3::Bucket",
+            "AWS::IAM::Role",
+            "AWS::IAM::POlicy"
+        ] 
+    } 
+}
+
+# Delivery channel
+resource "aws_config_delivery_channel" "this" {
+    name           = "${var.project_name}-${var.environment}-config"
+    s3_bucket_name = aws_s3_bucket.config.id
+
+    depends_on     = [aws_config_configuration_recorder.this]
+}
+
+# Start the recorder
+resource "aws_config_configuration_recorder_status" "this" {
+    name           = aws_config_configuration_recorder.this.name
+    is_enabled     = true
+
+    depends_on = [aws_config_delivery_channel.this]
+}
+
+#--- Config Rules ---
+
+resource "aws_config_config_rule" "s3_encryption" {
+    name = "s3-bucket-server-side-encryption-enabled"
+    source {
+        owner              = "AWS"
+        source_identifier  = "S3_BUCKET_SERVER_SIDE_ENCRYPTION_ENABLED"
+    }
+    depends_on             = [aws_config_configuration_recorder_status.this] 
+}
+
+resource "aws_config_config_rule" "restricted_ssh" {
+    name = "restricted-ssh"
+    source {
+        owner              = "AWS"
+        source_identifier  = "INCOMING_SSH_DISABLED" 
+    }
+    depends_on = [aws_config_configuration_recorder_status.this]
+}
+
+resource "aws_config_config_rule" "encrypted_volumes" {
+    name = "encrypted-volumes"
+    source {
+        owner              = "AWS"
+        source_identifier  = "ENCRYPTED_VOLUMES"
+    }
+    depends_on = [aws_config_configuration_recorder_status.this]
+}
+
+resource "aws_config_config_rule" "root_mfa" {
+    name = "root-account-mfa-enabled"
+    source {
+        owner              = "AWS"
+        source_identifier  = "ROOT_ACCOUNT_MFA_ENABLED"
+    }
+    depends_on = [aws_config_configuration_recorder_status.this]
+}

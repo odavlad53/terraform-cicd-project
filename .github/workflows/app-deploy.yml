@@ -20,6 +20,10 @@ env:
   ECS_CLUSTER: olga-project-dev-cluster
   ECS_SERVICE: olga-project-dev-service
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   lint-and-test:
     name: 'Lint & Test'
@@ -62,14 +66,48 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build, tag, and push image to ECR
+    - name: Build and tag image
       working-directory: ./app
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+
+    - name: Trivy vulnerability scan
+      uses: aquasecurity/trivy-action@master
+      with: 
+         image-ref: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha}}
+         format: 'sarif'
+         output: 'trivy-results.sarif'
+         exit-code: '1'
+         severity: 'CRITICAL,HIGH'
+         ignore-unfixed: true
+    
+    - name: Upload Trivy results to GItHub Security
+      if: always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+         sarif_file: 'trivy-results.sarif'
+    
+    - name: Push image to ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    
+    - name: Install cosign
+      uses: sigstore/cosign-installer@v3
+
+    - name: Sign image with cosign (keyless)
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+         IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG)
+         cosign sign --yes $IMAGE_DIGEST 
+       
 
   deploy:
     name: 'Deploy to ECS'
@@ -88,6 +126,19 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Install cosign
+      uses: sigstore/cosign-installer@v3
+
+    - name: Verify image signature
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cosign verify \
+          --certificate-identity-regexp "https://github.com/odavlad53/.*" \
+          --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+          $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
     - name: Download current task definition
       run: |

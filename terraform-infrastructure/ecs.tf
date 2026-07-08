@@ -100,6 +100,23 @@ resource "aws_iam_role" "ecs_task_execution" {
   }
 }
 
+resource "aws_iam_role_policy" "ecs_secrets" {
+  name = "${var.project_name}-${var.environment}-ecs-secrets-policy"
+  role = aws_iam_role.ecs_task_execution.id
+
+  policy = jsonencode ({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect  = "Allow"
+      Action =[
+        "kms:Decrypt"
+      ]
+
+      Resource = [aws_kms_key.secrets.arn]
+    }]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "ecs_task_execution" {
   role       = aws_iam_role.ecs_task_execution.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
@@ -197,6 +214,13 @@ resource "aws_ecs_task_definition" "this" {
       linuxParameters = {
         initProcessEnabled = true
       }
+
+      secrets = [
+        {
+          name      = "DB_PASSWORD"
+          valueFrom = "${aws_secretsmanager_secret.db.arn}:password::"
+        }
+      ]
     }
   ])
 
@@ -239,3 +263,4 @@ resource "aws_ecs_service" "this" {
     ManagedBy   = "Terraform"
   }
 }
+
