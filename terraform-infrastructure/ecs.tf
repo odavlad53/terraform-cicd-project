@@ -104,11 +104,11 @@ resource "aws_iam_role_policy" "ecs_secrets" {
   name = "${var.project_name}-${var.environment}-ecs-secrets-policy"
   role = aws_iam_role.ecs_task_execution.id
 
-  policy = jsonencode ({
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect  = "Allow"
-      Action =[
+      Effect = "Allow"
+      Action = [
         "kms:Decrypt"
       ]
 
