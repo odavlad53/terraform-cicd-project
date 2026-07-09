@@ -51,6 +51,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail" {
     transition {
       days          = 365
       storage_class = "GLACIER_IR"
+    }
     
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
