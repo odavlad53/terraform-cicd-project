@@ -26,9 +26,10 @@ data "aws_iam_policy_document" "secrets_kms_policy" {
   }
 }
 
-# The secret value - placeholder, not a real password
-#checkov:skip=CKV2_AWS_57: Lab secret is not connected to a production database; automatic rotation Lambda is out of scope
+# The secret value - placeholder, not a real production scope
 resource "aws_secretsmanager_secret" "db" {
+  #checkov:skip=CKV2_AWS_57: Lab secret is not connected to a production database; automatic rotation Lambda is out of scope
+
   name                    = "${var.project_name}/${var.environment}/db-password"
   kms_key_id              = aws_kms_key.secrets.arn
   recovery_window_in_days = 7
