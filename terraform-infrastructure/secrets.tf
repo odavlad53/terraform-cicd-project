@@ -3,6 +3,7 @@ resource "aws_kms_key" "secrets" {
   description             = "KMS key for Secrets Manager (${var.project_name}-{var.project_environment})"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.secrets_kms_policy.json
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-secrets-cmk"
@@ -11,8 +12,23 @@ resource "aws_kms_key" "secrets" {
   }
 }
 
+
+data "aws_iam_policy_document" "secrets_kms_policy" {
+  statement {
+    sid    = "EnableRootPermissions"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+}
+
 #The secret itself
 
+#checkov:skip=CKV2_AWS_57:No rotatable resource exists - placeholder secret for lab
 resource "aws_secretsmanager_secret" "db" {
   name                    = "${var.project_name}/${var.environment}/db-password"
   kms_key_id              = aws_kms_key.secrets.arn

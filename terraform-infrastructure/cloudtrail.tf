@@ -51,6 +51,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail" {
     transition {
       days          = 365
       storage_class = "GLACIER_IR"
+    
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
     }
   }
 }
@@ -73,6 +76,30 @@ resource "aws_s3_bucket_public_access_block" "cloudtrail_access_logs" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket_versioning" "cloudtrail_access_logs" {
+  bucket = aws_s3_bucket.cloudtrail_access_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail_access_logs" {
+  bucket = aws_s3_bucket.cloudtrail_access_logs.id
+  rule {
+    id     = "expire-old-logs"
+    status = "Enabled"
+    filter {}
+    expiration {
+      days = 90
+    }
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail_access_logs" {
   bucket = aws_s3_bucket.cloudtrail_access_logs.id
   rule {
@@ -88,6 +115,8 @@ resource "aws_s3_bucket_logging" "cloudtrail" {
 }
 
 #CloudWatch Log group
+
+#checkov:skip=CKV_AWS_338:14-day retention is intentional for lab cost management
 
 resource "aws_cloudwatch_log_group" "cloudtrail" {
   name              = "/aws/cloudtrail/${var.project_name}-${var.environment}"
@@ -300,6 +329,8 @@ resource "aws_kms_alias" "cloudtrail_alias" {
 }
 
 # The CloudTrail trail
+
+#checkov:skip=CKV_AWS_252:SNS notifications blocked by organization SCP
 
 resource "aws_cloudtrail" "this" {
   name                          = "${var.project_name}-${var.environment}-trail"

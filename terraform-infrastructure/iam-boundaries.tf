@@ -1,3 +1,10 @@
+#checkov:skip=CKV_AWS_49:Permission boundary intentionally uses Allow * as ceiling
+#checkov:skip=CKV_AWS_1:Permission boundary intentionally uses Allow * as ceiling
+#checkov:skip=CKV_AWS_110:Permission boundary uses Deny statements to prevent escalation
+#checkov:skip=CKV_AWS_108:Permission boundary uses Deny statements to limit data access
+#checkov:skip=CKV_AWS_107:Permission boundary uses Deny statements to limit credentials
+#checkov:skip=CKV2_AWS_40:Permission boundary intentionally uses Allow * as ceiling
+
 data "aws_iam_policy_document" "developer_boundary" {
   statement {
     sid       = "AllowEverythingByDefault"

@@ -1,3 +1,5 @@
+#checkov:skip=CKV2_AWS_3:Single-account lab - org-wide GuardDuty requires org admin
+
 resource "aws_guardduty_detector" "this" {
   enable = true
 

@@ -1,3 +1,5 @@
+#checkov:skip=CKV_AWS_231:Ephemeral port range includes 3389 - acceptable for return traffic
+
 resource "aws_network_acl" "private" {
   vpc_id     = aws_vpc.this.id
   subnet_ids = [for s in aws_subnet.private : s.id]
