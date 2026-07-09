@@ -40,38 +40,27 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail" {
   bucket = aws_s3_bucket.cloudtrail.id
 
   rule {
-    id = "Allow small object transitions"
-
-    filter {
-      object_size_greater_than = 1
-    }
-
+    id     = "abort-incomplete-multipart-uploads"
     status = "Enabled"
 
-    transition {
-      days          = 365
-      storage_class = "GLACIER_IR"
-    }
+    filter {}
 
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
-
     }
   }
 
   rule {
-    id = "transition-cloudtrail-logs"
+    id     = "transition-cloudtrail-logs"
+    status = "Enabled"
 
     filter {
       object_size_greater_than = 1
     }
 
-    status = "Enabled"
-
     transition {
       days          = 365
       storage_class = "GLACIER_IR"
-
     }
   }
 }
@@ -403,9 +392,7 @@ resource "aws_cloudtrail" "this" {
     Name        = "${var.project_name}-${var.environment}-trail"
     Environment = var.environment
     ManagedBy   = "Terraform"
-
   }
-
 }
 
 

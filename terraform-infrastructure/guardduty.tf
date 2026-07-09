@@ -1,5 +1,4 @@
-#checkov:skip=CKV2_AWS_3:Single-account lab - org-wide GuardDuty requires org admin
-
+#checkov:skip=CKV2_AWS_3: Single-account lab; AWS Organizations GuardDuty configuration is out of scope
 resource "aws_guardduty_detector" "this" {
   enable = true
 

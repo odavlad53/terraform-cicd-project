@@ -26,9 +26,8 @@ data "aws_iam_policy_document" "secrets_kms_policy" {
   }
 }
 
-#The secret itself
-
-#checkov:skip=CKV2_AWS_57: Lab secret is not connected to a rotatable production database; rotation Lambda is out of scope
+# The secret value - placeholder, not a real password
+#checkov:skip=CKV2_AWS_57: Lab secret is not connected to a production database; automatic rotation Lambda is out of scope
 resource "aws_secretsmanager_secret" "db" {
   name                    = "${var.project_name}/${var.environment}/db-password"
   kms_key_id              = aws_kms_key.secrets.arn
@@ -38,21 +37,6 @@ resource "aws_secretsmanager_secret" "db" {
     Name        = "${var.project_name}-${var.environment}-db-password"
     Environment = var.environment
     ManagedBy   = "Terraform"
-
-  }
-}
-
-# The secret value - placeholder, not a real password
-
-resource "aws_secretsmanager_secret_version" "db" {
-  secret_id = aws_secretsmanager_secret.db.id
-  secret_string = jsonencode({
-    username = "appuser"
-    password = "PLACEHOLDER_CHANGE_ME"
-  })
-
-  lifecycle {
-    ignore_changes = [secret_string]
   }
 }
 
