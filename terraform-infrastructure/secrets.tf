@@ -28,7 +28,7 @@ data "aws_iam_policy_document" "secrets_kms_policy" {
 
 #The secret itself
 
-#checkov:skip=CKV2_AWS_57:No rotatable resource exists - placeholder secret for lab
+#checkov:skip=CKV2_AWS_57: Lab secret is not connected to a rotatable production database; rotation Lambda is out of scope
 resource "aws_secretsmanager_secret" "db" {
   name                    = "${var.project_name}/${var.environment}/db-password"
   kms_key_id              = aws_kms_key.secrets.arn

@@ -52,9 +52,26 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail" {
       days          = 365
       storage_class = "GLACIER_IR"
     }
-    
+
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
+
+    }
+  }
+
+  rule {
+    id = "transition-cloudtrail-logs"
+
+    filter {
+      object_size_greater_than = 1
+    }
+
+    status = "Enabled"
+
+    transition {
+      days          = 365
+      storage_class = "GLACIER_IR"
+
     }
   }
 }
@@ -121,7 +138,7 @@ resource "aws_s3_bucket_logging" "cloudtrail" {
 
 resource "aws_cloudwatch_log_group" "cloudtrail" {
   name              = "/aws/cloudtrail/${var.project_name}-${var.environment}"
-  retention_in_days = 14
+  retention_in_days = 365
   kms_key_id        = aws_kms_key.cloudtrail.arn
 
   tags = {
@@ -129,6 +146,39 @@ resource "aws_cloudwatch_log_group" "cloudtrail" {
     Environment = var.environment
     ManagedBy   = "Terraform"
   }
+}
+
+#SNS topic
+
+resource "aws_sns_topic" "cloudtrail" {
+  name              = "${var.project_name}-${var.environment}-cloudtrail-alerts"
+  kms_master_key_id = "alias/aws/sns"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-cloudtrail-alerts"
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+data "aws_iam_policy_document" "cloudtrail_sns_policy" {
+  statement {
+    sid    = "AllowCloudTrailPublish"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.cloudtrail.arn]
+  }
+}
+
+resource "aws_sns_topic_policy" "cloudtrail" {
+  arn    = aws_sns_topic.cloudtrail.arn
+  policy = data.aws_iam_policy_document.cloudtrail_sns_policy.json
 }
 
 # Trust policy - who can assume this aws_iam_role
@@ -342,8 +392,12 @@ resource "aws_cloudtrail" "this" {
   kms_key_id                    = aws_kms_key.cloudtrail.arn
   cloud_watch_logs_group_arn    = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
   cloud_watch_logs_role_arn     = aws_iam_role.cloudtrail_cw.arn
+  sns_topic_name                = aws_sns_topic.cloudtrail.name
 
-  depends_on = [aws_s3_bucket_policy.cloudtrail]
+  depends_on = [
+    aws_s3_bucket_policy.cloudtrail,
+    aws_sns_topic_policy.cloudtrail
+  ]
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-trail"

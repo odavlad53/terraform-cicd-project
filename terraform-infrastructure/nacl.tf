@@ -31,9 +31,20 @@ resource "aws_network_acl" "private" {
     action     = "allow"
     cidr_block = "0.0.0.0/0"
     from_port  = 1024
+    to_port    = 3388
+
+  }
+
+  ingress {
+    rule_no    = 110
+    protocol   = "tcp"
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 3390
     to_port    = 65535
 
   }
+
 
   # Allow outbound traffic
   egress {
