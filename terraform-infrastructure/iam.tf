@@ -1,6 +1,7 @@
 # IAM role for EC2 instance
 resource "aws_iam_role" "ec2_role" {
-  name = "${var.project_name}-${var.environment}-ec2-role"
+  name                 = "${var.project_name}-${var.environment}-ec2-role"
+  permissions_boundary = aws_iam_policy.developer_boundary.arn
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"

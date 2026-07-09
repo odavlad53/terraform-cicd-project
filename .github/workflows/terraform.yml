@@ -69,6 +69,8 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
     needs: [terraform-validate, terraform-security-scan]
     if: github.event_name == 'pull_request'
     steps:
