@@ -30,3 +30,27 @@ Verification required before deployment to ECS.
 - Every build: Trivy scan in CI/CD pipeline
 - Weekly: ECR scan-on-push results reviewed
 - Monthly: Full review of .trivyignore exceptions
+
+## Scan Results
+
+Date: 2026-07-10
+Image: 657840741348.dkr.ecr.us-east-1.amazonaws.com/olga-project-dev-app:latest
+Base image: Alpine 3.23.3
+Scanner: Trivy v0.69
+
+### Findings
+
+- CRITICAL: 0
+- HIGH: 0
+
+No vulnerabilities found at CRITICAL or HIGH severity. The Alpine base image and Node.js dependencies are current and patched.
+
+### Resolution
+
+No remediation required. Clean scan. The .trivyignore file is empty — no exceptions needed.
+
+### Notes
+
+- Alpine minimal base image keeps the attack surface small (28 packages total)
+- Full scan includes both OS packages and Node.js dependencies
+- CI/CD pipeline will block future deployments if CRITICAL or HIGH CVEs are introduced
