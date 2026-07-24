@@ -43,7 +43,7 @@ resource "aws_secretsmanager_secret" "db" {
 
 # Secret version
 resource "aws_secretsmanager_secret_version" "db" {
-  secret_id     = aws_secretsmanager_secret.db.id
+  secret_id = aws_secretsmanager_secret.db.id
   secret_string = jsonencode({
     username = "appuser"
     password = "PLACEHOLDER_CHANGE_ME"

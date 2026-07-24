@@ -4,8 +4,8 @@ locals {
 
 
 resource "aws_kms_key" "ecs_logs" {
-  description         = "KMS key for ECS CloudWatch Logs (${var.project_name}-${var.environment})"
-  enable_key_rotation = true
+  description             = "KMS key for ECS CloudWatch Logs (${var.project_name}-${var.environment})"
+  enable_key_rotation     = true
   deletion_window_in_days = 7
 
   policy = jsonencode({

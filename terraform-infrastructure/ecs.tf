@@ -12,18 +12,18 @@ module "ecs" {
 
   target_group_arn = module.alb.target_group_arn
 
-  container_name = "${var.project_name}-app"
-  container_port = 3000
+  container_name  = "${var.project_name}-app"
+  container_port  = 3000
   container_image = "${aws_ecr_repository.this.repository_url}:latest"
-  
-  desired_count = 2
+
+  desired_count          = 2
   enable_execute_command = true
 
-  db_secret_arn = aws_secretsmanager_secret.db.arn
+  db_secret_arn       = aws_secretsmanager_secret.db.arn
   secrets_kms_key_arn = aws_kms_key.secrets.arn
 
   depends_on = [
     module.alb
-    ]
+  ]
 
 }

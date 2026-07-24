@@ -385,7 +385,7 @@ resource "aws_cloudtrail" "this" {
 
   depends_on = [
     aws_s3_bucket_policy.cloudtrail,
-  #  aws_sns_topic_policy.cloudtrail
+    #  aws_sns_topic_policy.cloudtrail
   ]
 
   tags = {
