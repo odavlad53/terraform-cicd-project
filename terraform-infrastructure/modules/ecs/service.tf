@@ -4,7 +4,7 @@ resource "aws_ecs_service" "this" {
   task_definition  = aws_ecs_task_definition.this.arn
   desired_count    = var.desired_count
   launch_type      = "FARGATE"
-  platform_version = "1.4.0"
+  platform_version = "LATEST"
 
   # Enable ECS Exec (SSM) for container access
   enable_execute_command = var.enable_execute_command

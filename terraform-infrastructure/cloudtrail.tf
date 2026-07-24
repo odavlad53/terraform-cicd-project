@@ -370,7 +370,7 @@ resource "aws_kms_alias" "cloudtrail_alias" {
 
 # The CloudTrail trail
 
-#checkov:skip=CKV_AWS_252:SNS notifications blocked by organization SCP
+#checkov:skip=CKV_AWS_252:SNS notifications blocked by organization SCP - documented in COMPLIANCE_REPORT.md
 
 resource "aws_cloudtrail" "this" {
   name                          = "${var.project_name}-${var.environment}-trail"
