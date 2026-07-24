@@ -41,6 +41,19 @@ resource "aws_secretsmanager_secret" "db" {
   }
 }
 
+# Secret version
+resource "aws_secretsmanager_secret_version" "db" {
+  secret_id     = aws_secretsmanager_secret.db.id
+  secret_string = jsonencode({
+    username = "appuser"
+    password = "PLACEHOLDER_CHANGE_ME"
+  })
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
 #reference the existing OIDC provider
 data "aws_iam_openid_connect_provider" "eks" {
   url = "https://oidc.eks.${var.aws_region}.amazonaws.com/id/66F4B6DC9582BCFEE67BBCEE8E3ED1B7"

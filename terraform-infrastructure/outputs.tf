@@ -25,22 +25,22 @@ output "ecr_repository_url" {
 
 output "alb_dns_name" {
   description = "DNS name of the Application Load Balancer"
-  value       = aws_lb.this.dns_name
+  value       = module.alb.alb_dns_name
 }
 
 output "ecs_cluster_name" {
   description = "Name of the ECS cluster"
-  value       = aws_ecs_cluster.this.name
+  value       = module.ecs.cluster_name
 }
 
 output "ecs_service_name" {
   description = "Name of the ECS service"
-  value       = aws_ecs_service.this.name
+  value       = module.ecs.service_name
 }
 
 output "app_url" {
   description = "URL to access the application"
-  value       = "http://${aws_lb.this.dns_name}"
+  value       = "http://${module.alb.alb_dns_name}"
 }
 
 output "vpc_id" {
@@ -50,16 +50,16 @@ output "vpc_id" {
 
 output "eks_cluster_name" {
   description = "Name of the EKS cluster"
-  value       = aws_eks_cluster.this.name
+  value       = module.eks.cluster_name
 }
 
 output "eks_cluster_endpoint" {
   description = "Endpoint for the EKS cluster API server"
-  value       = aws_eks_cluster.this.endpoint
+  value       = module.eks.cluster_endpoint
 }
 
 output "eks_cluster_ca" {
   description = "Certificate authority data for the EKS cluster"
-  value       = aws_eks_cluster.this.certificate_authority[0].data
+  value       = module.eks.cluster_ca
   sensitive   = true
 }
