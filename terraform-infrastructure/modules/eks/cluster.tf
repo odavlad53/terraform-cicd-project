@@ -1,8 +1,8 @@
 # --- EKS Cluster ---
-#checkov:skip=CKV_AWS_39: Lab scope - kubectl access requires public endpoint
-#checkov:skip=CKV_AWS_38: Lab scope - public endpoint temporarily open for VPN IP rotation issues
-resource "aws_eks_cluster" "this" {
 
+resource "aws_eks_cluster" "this" {
+  #checkov:skip=CKV_AWS_39: Lab scope - kubectl access requires public endpoint
+  #checkov:skip=CKV_AWS_38: Lab scope - public endpoint temporarily open for VPN IP rotation issues
   name     = "${var.project_name}-${var.environment}"
   role_arn = aws_iam_role.eks_cluster.arn
   version  = "1.31"
