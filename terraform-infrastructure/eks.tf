@@ -5,6 +5,6 @@ module "eks" {
   environment             = var.environment
   aws_region              = var.aws_region
   eks_public_access_cidrs = var.eks_public_access_cidrs
-  private_subnet_ids      = [for s in aws_subnet.private : s.id]
-  public_subnet_ids       = [for s in aws_subnet.public : s.id]
+  private_subnet_ids      = module.vpc.private_subnet_ids
+  public_subnet_ids       = module.vpc.public_subnet_ids
 }

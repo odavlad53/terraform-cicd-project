@@ -126,3 +126,114 @@ moved {
   from = aws_eks_node_group.this
   to   = module.eks.aws_eks_node_group.this
 }
+# VPC resources
+moved {
+  from = aws_vpc.this
+  to   = module.vpc.aws_vpc.this
+}
+
+moved {
+  from = aws_internet_gateway.this
+  to   = module.vpc.aws_internet_gateway.this
+}
+
+moved {
+  from = aws_eip.nat
+  to   = module.vpc.aws_eip.nat
+}
+
+moved {
+  from = aws_nat_gateway.this
+  to   = module.vpc.aws_nat_gateway.this
+}
+
+moved {
+  from = aws_subnet.public
+  to   = module.vpc.aws_subnet.public
+}
+
+moved {
+  from = aws_subnet.private
+  to   = module.vpc.aws_subnet.private
+}
+
+moved {
+  from = aws_route_table.public
+  to   = module.vpc.aws_route_table.public
+}
+
+moved {
+  from = aws_route_table.private
+  to   = module.vpc.aws_route_table.private
+}
+
+moved {
+  from = aws_route_table_association.public
+  to   = module.vpc.aws_route_table_association.public
+}
+
+moved {
+  from = aws_route_table_association.private
+  to   = module.vpc.aws_route_table_association.private
+}
+
+moved {
+  from = aws_default_security_group.default
+  to   = module.vpc.aws_default_security_group.default
+}
+
+moved {
+  from = aws_kms_key.vpc_flow_logs
+  to   = module.vpc.aws_kms_key.vpc_flow_logs
+}
+
+moved {
+  from = aws_kms_alias.vpc_flow_logs
+  to   = module.vpc.aws_kms_alias.vpc_flow_logs
+}
+
+moved {
+  from = aws_cloudwatch_log_group.vpc_flow_logs
+  to   = module.vpc.aws_cloudwatch_log_group.vpc_flow_logs
+}
+
+moved {
+  from = aws_iam_role.vpc_flow_logs
+  to   = module.vpc.aws_iam_role.vpc_flow_logs
+}
+
+moved {
+  from = aws_iam_role_policy.vpc_flow_logs
+  to   = module.vpc.aws_iam_role_policy.vpc_flow_logs
+}
+
+moved {
+  from = aws_flow_log.vpc
+  to   = module.vpc.aws_flow_log.vpc
+}
+
+moved {
+  from = aws_security_group.alb
+  to   = module.vpc.aws_security_group.alb
+}
+
+moved {
+  from = aws_security_group.ecs_tasks
+  to   = module.vpc.aws_security_group.ecs_tasks
+}
+
+moved {
+  from = aws_network_acl.private
+  to   = module.vpc.aws_network_acl.private
+}
+
+# ECR resources
+moved {
+  from = aws_ecr_repository.this
+  to   = module.ecr.aws_ecr_repository.this
+}
+
+moved {
+  from = aws_ecr_lifecycle_policy.this
+  to   = module.ecr.aws_ecr_lifecycle_policy.this
+}

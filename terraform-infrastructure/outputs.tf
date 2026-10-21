@@ -20,7 +20,7 @@ output "ec2_public_ip" {
 
 output "ecr_repository_url" {
   description = "URL of the ECR repository"
-  value       = aws_ecr_repository.this.repository_url
+  value       = module.ecr.repository_url
 }
 
 output "alb_dns_name" {
@@ -45,7 +45,7 @@ output "app_url" {
 
 output "vpc_id" {
   description = "ID of the VPC"
-  value       = aws_vpc.this.id
+  value       = module.vpc.vpc_id
 }
 
 output "eks_cluster_name" {
